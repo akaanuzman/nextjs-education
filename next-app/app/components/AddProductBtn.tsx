@@ -3,7 +3,7 @@ import React from 'react'
 
 const AddProductBtn = () => {
     return (
-        <button onClick={() => console.log("Tapped...")}> Add Product</button>
+        <button className='btn btn-primary'  onClick={() => console.log("Tapped...")}> Add Product</button>
     )
 }
 
