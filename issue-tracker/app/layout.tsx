@@ -27,7 +27,11 @@ export default function RootLayout({
         <Theme appearance="light" accentColor="purple" grayColor="gray">
           <NavBar />
           <main className='p-5'>{children}</main>
-          <ThemePanel />
+          {
+            /* <ThemePanel />
+              This is a panel that allows you to change the theme on the fly.
+            */
+          }
         </Theme>
       </body>
     </html>
