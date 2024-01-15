@@ -1,8 +1,8 @@
 'use client';
 
-import { Button, TextArea, TextField } from '@radix-ui/themes';
+import { Button, Callout, TextArea, TextField } from '@radix-ui/themes';
 import React, { useState } from 'react';
-import { ChatBubbleIcon } from '@radix-ui/react-icons';
+import { ChatBubbleIcon, InfoCircledIcon } from '@radix-ui/react-icons';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
@@ -16,25 +16,23 @@ interface NewIssueForm {
 const NewIssuePage = () => {
     const router = useRouter();
     const { register, handleSubmit, formState: { errors } } = useForm<NewIssueForm>();
-    const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+    const [error, setError] = useState('');
 
     const onSubmit = async (data: NewIssueForm) => {
-        if (!data.title || !data.description) {
-            // Set submit status to 'error' if title or description is empty
-            setSubmitStatus('error');
-            return;
-        }
-
         try {
             // Make the API call
             await axios.post('/api/issues', data);
-            // Set submit status to 'success' if the API call is successful
-            setSubmitStatus('success');
+
             // Redirect to the 'issues' page after successful submission
             router.push('/issues');
-        } catch (error) {
-            // Set submit status to 'error' if there is an error with the API call
-            setSubmitStatus('error');
+        } catch (error: any) {
+            if (error.response.data.length === 1) {
+                const errorMessage = error.response.data[0].message;
+                setError(errorMessage);
+                return;
+            }
+            const errorMessage = error.response.data[0].message + ' ' + error.response.data[1].message;
+            setError(errorMessage);
         }
     };
 
@@ -50,8 +48,14 @@ const NewIssuePage = () => {
                 <ChatBubbleIcon />
                 Submit New Issue
             </Button>
-            {submitStatus === 'error' && <p className="text-red-500">Error: Please fill out both title and description.</p>}
-            {submitStatus === 'success' && <p className="text-green-500">Success: Issue submitted successfully!</p>}
+            {error && (
+                <Callout.Root color='red'>
+                    <Callout.Icon>
+                        <InfoCircledIcon />
+                    </Callout.Icon>
+                    <Callout.Text>{error}</Callout.Text>
+                </Callout.Root>
+            )}
         </form>
     )
 }
